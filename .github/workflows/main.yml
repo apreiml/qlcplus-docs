@@ -34,13 +34,15 @@ jobs:
     - name: Cache APT Packages
       uses: actions/cache@v4
       with:
-        path: /var/cache/apt
+        path: /var/cache/apt/archives
         key: ${{ runner.os }}-apt-cache
         restore-keys: ${{ runner.os }}-apt-cache
 
     - name: Setup APT Cache and Update
       run: |
-        if [ ! -d "/var/cache/apt" ]; then
+        sudo mkdir -p /var/cache/apt/archives/partial
+        sudo chown -R runner:docker /var/cache/apt/archives
+        if [ ! -d "/var/cache/apt/archives" ]; then
           sudo apt-get update
         else
           echo "Using cached APT metadata."
