@@ -89,9 +89,8 @@ jobs:
         TEMP_DIR: ${{ env.TEMP_DIR }} 
         MAIN_FONT: ${{ env.MAIN_FONT }}
       with:
-          args: >
-            -s -o ${{ env.TEMP_DIR }}/QLCplusDocumentation.pdf
-             ${{ env.MARKDOWN_DIR }}/qlcplus-docs.md
+          args: >-
+            -s -o ${{ env.TEMP_DIR }}/QLCplusDocumentation.pdf ${{ env.MARKDOWN_DIR }}/qlcplus-docs.md
             --listings 
             --pdf-engine=lualatex
             -V papersize=a4 
