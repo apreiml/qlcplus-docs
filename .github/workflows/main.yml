@@ -141,10 +141,10 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
           name: qlcplus-docs-en-pdf
-          path: $PDF_DIR/
+          path: ${{ env.PDF_DIR }}/
 
     - name: Upload-Markdown
       uses: actions/upload-artifact@v4
       with:
           name: qlcplus-docs-en-markdown
-          path: $MARKDOWN_DIR/
+          path: ${{ env.MARKDOWN_DIR }}/
