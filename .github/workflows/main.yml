@@ -90,8 +90,8 @@ jobs:
         MAIN_FONT: ${{ env.MAIN_FONT }}
       with:
           args: >
-            -s -o $TEMP_DIR/QLCplusDocumentation.pdf
-            $MARKDOWN_DIR/qlcplus-docs.md
+            -s -o ${{ env.TEMP_DIR }}/QLCplusDocumentation.pdf
+             ${{ env.MARKDOWN_DIR }}/qlcplus-docs.md
             --listings 
             --pdf-engine=lualatex
             -V papersize=a4 
@@ -116,8 +116,8 @@ jobs:
         MAIN_FONT: ${{ env.MAIN_FONT }}
       with:
           args: >
-                -s -o $TEMP_DIR/titlepage.pdf 
-                $TEMP_DIR/titlepage.md 
+                -s -o ${{ env.TEMP_DIR }}/titlepage.pdf 
+                ${{ env.TEMP_DIR }}/titlepage.md 
                 --pdf-engine=lualatex
                 --template=./scripts/template.tex
                 --verbose
