@@ -84,11 +84,11 @@ jobs:
     
     - name: Build PDF from combined markdown
       uses: docker://pandoc/extra
+      env:
+        MARKDOWN_DIR: ${{ env.MARKDOWN_DIR }}
+        TEMP_DIR: ${{ env.TEMP_DIR }} 
+        MAIN_FONT: ${{ env.MAIN_FONT }}
       with:
-          env:
-            MARKDOWN_DIR: ${{ env.MARKDOWN_DIR }}
-            TEMP_DIR: ${{ env.TEMP_DIR }} 
-            MAIN_FONT: ${{ env.MAIN_FONT }}
           args: >
             -s -o $TEMP_DIR/QLCplusDocumentation.pdf
             $MARKDOWN_DIR/qlcplus-docs.md
@@ -110,11 +110,11 @@ jobs:
               
     - name: Convert Title Page to PDF
       uses: docker://pandoc/extra
+      env:
+        MARKDOWN_DIR: ${{ env.MARKDOWN_DIR }}
+        TEMP_DIR: ${{ env.TEMP_DIR }} 
+        MAIN_FONT: ${{ env.MAIN_FONT }}
       with:
-          env:
-            MARKDOWN_DIR: ${{ env.MARKDOWN_DIR }}
-            TEMP_DIR: ${{ env.TEMP_DIR }}
-            MAIN_FONT: ${{ env.MAIN_FONT }}
           args: >
                 -s -o $TEMP_DIR/titlepage.pdf 
                 $TEMP_DIR/titlepage.md 
