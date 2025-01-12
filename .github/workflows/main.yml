@@ -1,13 +1,22 @@
-name: spellcheck
+name: Documentation Build
 on:
   push:
   pull_request:
+
+env:
+  MARKDOWN_DIR: ./.github/workflows/bin/markdown
+  TEMP_DIR: ./.github/workflows/bin/temp
+  PDF_DIR: ./.github/workflows/bin/pdf
+  IMAGES_DIR: ./images
+  MAIN_FONT: "Source Sans Pro"
+
 jobs:
   check-spelling:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Check Spelling
         uses: rojopolis/spellcheck-github-actions@0.45.0
         with:
@@ -20,16 +29,21 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       
-    - name: Install PowerShell
+    - name: Setup Dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y powershell
+          sudo apt-get update
+          sudo apt-get install -y powershell imagemagick ghostscript
+
+    - name: Cache APT Packages
+      uses: actions/cache@v4
+      with:
+        path: /var/cache/apt
+        key: ${{ runner.os }}-apt-cache
+        restore-keys: ${{ runner.os }}-apt-cache
+
 
     - name: Create output paths
-      run: |
-        mkdir -p ./.github/workflows/bin/temp
-        mkdir -p ./.github/workflows/bin/markdown
-        mkdir -p ./.github/workflows/bin/pdf
+      run: mkdir -p $TEMP_DIR $MARKDOWN_DIR $PDF_DIR
 
     - name: Run PowerShell script
       shell: pwsh
@@ -40,9 +54,6 @@ jobs:
       run: |
         cp -r ./.github/workflows/bin/markdown/images ./images
         sed -i '/!\[\](images\/qlcplus\.svg)/d'  ./.github/workflows/bin/markdown/qlcplus-docs.md 
-
-    - name: Install ImageMagick for image normalization
-      run: sudo apt-get install -y imagemagick
 
     - name: Normalize image DPI
       run: |
@@ -107,11 +118,8 @@ jobs:
                 -V date="${{env.EXPORT_DATE}}"
                 -V release="${{env.LATEST_RELEASE}}"
                   
-
     - name: Combine Title Page and Documentation PDFs
       run: |
-        sudo apt-get update
-        sudo apt-get install -y ghostscript
         gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=./.github/workflows/bin/pdf/qlcplus-docs.pdf ./.github/workflows/bin/temp/titlepage.pdf ./.github/workflows/bin/temp/QLCplusDocumentation.pdf
      
     - name: Cleanup temporary items
