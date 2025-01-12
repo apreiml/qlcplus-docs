@@ -1,7 +1,5 @@
 name: Documentation Build
-on:
-  push:
-  pull_request:
+on: [push, pull_request] 
 
 env:
   MARKDOWN_DIR: ./.github/workflows/bin/markdown
@@ -9,6 +7,10 @@ env:
   PDF_DIR: ./.github/workflows/bin/pdf
   IMAGES_DIR: ./images
   MAIN_FONT: "Source Sans Pro"
+  PANDOC_COMMON_ARGS: >-
+    --pdf-engine=lualatex
+    -V mainfont="Source Sans Pro"
+    -V sansfont="Source Sans Pro"
 
 jobs:
   check-spelling:
@@ -56,7 +58,7 @@ jobs:
       run: |
         ./scripts/Merge-MarkdownFiles.ps1
 
-    - name: Fix logo and copy images to root directory for pandoc # images directory is deleted in "Cleanup temporary items" step
+    - name: Fix logo and copy images to root directory for pandoc
       run: |
         cp -r $MARKDOWN_DIR/images ./images
         sed -i '/!\[\](images\/qlcplus\.svg)/d'  $MARKDOWN_DIR/qlcplus-docs.md 
@@ -73,7 +75,7 @@ jobs:
     - name: Fetch Latest Release
       id: get_release
       env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Set the token for GitHub CLI authentication
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
           RELEASE=$(gh release view --json tagName --jq .tagName)
           echo "LATEST_RELEASE=$RELEASE" >> $GITHUB_ENV
@@ -84,23 +86,17 @@ jobs:
     
     - name: Build PDF from combined markdown
       uses: docker://pandoc/extra
-      env:
-        MARKDOWN_DIR: ${{ env.MARKDOWN_DIR }}
-        TEMP_DIR: ${{ env.TEMP_DIR }} 
-        MAIN_FONT: ${{ env.MAIN_FONT }}
       with:
           args: >-
             -s -o ${{ env.TEMP_DIR }}/QLCplusDocumentation.pdf ${{ env.MARKDOWN_DIR }}/qlcplus-docs.md
             --listings 
-            --pdf-engine=lualatex
+            ${{ env.PANDOC_COMMON_ARGS }}
             -V papersize=a4 
             -V geometry:margin=1.5cm
             -V classoption=oneside 
             -V indent=false
             -V toc=true
             -V toc-title="Table of Contents"
-            -V mainfont="Source Sans Pro"
-            -V sansfont="Source Sans Pro"
             -f markdown-raw_tex 
 
     - name: Create Title Page Markdown
@@ -109,19 +105,12 @@ jobs:
               
     - name: Convert Title Page to PDF
       uses: docker://pandoc/extra
-      env:
-        MARKDOWN_DIR: ${{ env.MARKDOWN_DIR }}
-        TEMP_DIR: ${{ env.TEMP_DIR }} 
-        MAIN_FONT: ${{ env.MAIN_FONT }}
       with:
           args: >
                 -s -o ${{ env.TEMP_DIR }}/titlepage.pdf 
                 ${{ env.TEMP_DIR }}/titlepage.md 
-                --pdf-engine=lualatex
+                ${{ env.PANDOC_COMMON_ARGS }}
                 --template=./scripts/template.tex
-                --verbose
-                -V mainfont="Source Sans Pro"
-                -V sansfont="Source Sans Pro"
                 -V title="Q Light Controller + Documentation"
                 -V subtitle="Comprehensive Guide"
                 -V author="docs.qlcplus.org"
