@@ -48,7 +48,6 @@ jobs:
       run: |
           sudo apt-get install -y powershell imagemagick ghostscript gh
 
-
     - name: Create output paths
       run: mkdir -p $TEMP_DIR $MARKDOWN_DIR $PDF_DIR
 
@@ -83,16 +82,16 @@ jobs:
       run: |
         echo "EXPORT_DATE=$(date --rfc-3339=date)" >> ${GITHUB_ENV}
     
-    - name: List files in the markdown directory
-      run: |
-        ls -la $MARKDOWN_DIR
-
-    - name: Build PDF
+    - name: Build PDF from combined markdown
       uses: docker://pandoc/extra
       with:
+          env:
+            MARKDOWN_DIR: ${{ env.MARKDOWN_DIR }}
+            TEMP_DIR: ${{ env.TEMP_DIR }} 
+            MAIN_FONT: ${{ env.MAIN_FONT }}
           args: >
             -s -o $TEMP_DIR/QLCplusDocumentation.pdf
-            .github/workflows/bin/markdown/qlcplus-docs.md
+            $MARKDOWN_DIR/qlcplus-docs.md
             --listings 
             --pdf-engine=lualatex
             -V papersize=a4 
@@ -112,6 +111,10 @@ jobs:
     - name: Convert Title Page to PDF
       uses: docker://pandoc/extra
       with:
+          env:
+            MARKDOWN_DIR: ${{ env.MARKDOWN_DIR }}
+            TEMP_DIR: ${{ env.TEMP_DIR }}
+            MAIN_FONT: ${{ env.MAIN_FONT }}
           args: >
                 -s -o $TEMP_DIR/titlepage.pdf 
                 $TEMP_DIR/titlepage.md 
