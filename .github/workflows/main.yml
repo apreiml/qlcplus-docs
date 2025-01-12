@@ -83,6 +83,10 @@ jobs:
       run: |
         echo "EXPORT_DATE=$(date --rfc-3339=date)" >> ${GITHUB_ENV}
     
+    - name: List files in the markdown directory
+      run: |
+        ls -la $MARKDOWN_DIR
+
     - name: Build PDF
       uses: docker://pandoc/extra
       with:
