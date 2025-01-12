@@ -92,7 +92,7 @@ jobs:
       with:
           args: >
             -s -o $TEMP_DIR/QLCplusDocumentation.pdf
-            $MARKDOWN_DIR/qlcplus-docs.md 
+            .github/workflows/bin/markdown/qlcplus-docs.md
             --listings 
             --pdf-engine=lualatex
             -V papersize=a4 
